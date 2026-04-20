@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Support Team Members</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #fff; color: #1a1a1a; padding: 24px; }
+  h1 { font-size: 26px; font-weight: 600; color: #1a3a5c; margin-bottom: 6px; }
+  .subtitle { font-size: 13px; color: #666; margin-bottom: 6px; }
+  .your-time-banner { display: inline-flex; align-items: center; gap: 8px; background: #f4f6f8; border-radius: 8px; padding: 8px 14px; font-size: 13px; color: #555; margin-bottom: 24px; }
+  .your-time-banner strong { color: #1a1a1a; }
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  thead th { text-align: left; font-size: 12px; font-weight: 600; color: #888; padding: 0 12px 10px; border-bottom: 1px solid #e5e7eb; text-transform: uppercase; letter-spacing: 0.04em; }
+  tbody td { padding: 14px 12px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+  tbody tr:last-child td { border-bottom: none; }
+  tbody tr:hover { background: #fafafa; }
+  .role-badge { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 4px; display: inline-block; white-space: nowrap; }
+  .avatar { width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; margin-right: 10px; flex-shrink: 0; }
+  .name-cell { display: flex; align-items: center; }
+  .name-text { font-weight: 500; color: #1a1a1a; }
+  .local-time { font-size: 15px; font-weight: 600; color: #1a1a1a; }
+  .local-date { font-size: 11px; color: #888; margin-top: 2px; }
+  .hours-text { font-size: 12px; color: #666; }
+  .status-cell { display: flex; align-items: center; gap: 6px; }
+  .status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
+  .status-text { font-size: 12px; font-weight: 500; }
+  .footer { font-size: 11px; color: #aaa; margin-top: 16px; }
+</style>
+</head>
+<body>
+
+<h1>Support Team Members</h1>
+<p class="subtitle">All times shown in each member's local timezone. Status auto-updates.</p>
+<div class="your-time-banner">
+  Your local time: <strong id="viewer-time">—</strong>
+  <span style="color:#ccc">|</span>
+  <span id="viewer-tz" style="font-size:12px;color:#888">detecting...</span>
+</div>
+
+<table>
+  <thead>
+    <tr>
+      <th>Role</th>
+      <th>Name</th>
+      <th>Local Time</th>
+      <th>Working Hours</th>
+      <th>Status</th>
+    </tr>
+  </thead>
+  <tbody id="team-body"></tbody>
+</table>
+
+<p class="footer">Working hours are 9:00 AM – 6:00 PM in each member's local timezone. Updates every 30 seconds.</p>
+
+<script>
+const members = [
+  {
+    role: "Director",
+    name: "Mac Hill",
+    handle: "@Mac Hill",
+    tz: "America/Chicago",
+    tzLabel: "Central Time (CT)",
+    workStart: 9, workEnd: 18,
+    initials: "MH",
+    avatarBg: "#E6F1FB", avatarColor: "#0C447C",
+    badgeBg: "#E6F1FB", badgeColor: "#0C447C"
+  },
+  {
+    role: "Manager",
+    name: "Jason Tuchler",
+    handle: "@Jason Tuchler",
+    tz: "America/Los_Angeles",
+    tzLabel: "Pacific Time (PT)",
+    workStart: 9, workEnd: 18,
+    initials: "JT",
+    avatarBg: "#E1F5EE", avatarColor: "#085041",
+    badgeBg: "#E1F5EE", badgeColor: "#085041"
+  },
+  {
+    role: "Team Lead",
+    name: "Umair Siddiqi",
+    handle: "@Umair Siddiqi",
+    tz: "Asia/Karachi",
+    tzLabel: "Pakistan Standard Time (PKT)",
+    workStart: 9, workEnd: 18,
+    initials: "US",
+    avatarBg: "#EEEDFE", avatarColor: "#3C3489",
+    badgeBg: "#EEEDFE", badgeColor: "#3C3489"
+  },
+  {
+    role: "Sr. Support Engineer",
+    name: "Alex Chepurnoy",
+    handle: "@Alex Chepurnoy",
+    tz: "America/New_York",
+    tzLabel: "Eastern Time (ET)",
+    workStart: 9, workEnd: 18,
+    initials: "AC",
+    avatarBg: "#FAECE7", avatarColor: "#712B13",
+    badgeBg: "#FAECE7", badgeColor: "#712B13"
+  },
+  {
+    role: "Sr. Support Engineer",
+    name: "Jason Hilton",
+    handle: "@Jason Hilton",
+    tz: "Europe/London",
+    tzLabel: "Greenwich Mean Time (GMT)",
+    workStart: 9, workEnd: 18,
+    initials: "JH",
+    avatarBg: "#EAF3DE", avatarColor: "#27500A",
+    badgeBg: "#EAF3DE", badgeColor: "#27500A"
+  }
+];
+
+function formatTime(date, tz) {
+  return date.toLocaleTimeString("en-US", { timeZone: tz, hour: "2-digit", minute: "2-digit", hour12: true });
+}
+function formatDate(date, tz) {
+  return date.toLocaleDateString("en-US", { timeZone: tz, weekday: "short", month: "short", day: "numeric" });
+}
+function getHour(date, tz) {
+  const h = parseInt(date.toLocaleTimeString("en-US", { timeZone: tz, hour: "2-digit", hour12: false }));
+  return isNaN(h) ? 0 : h;
+}
+
+function render() {
+  const now = new Date();
+  const viewerTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+  document.getElementById("viewer-time").textContent = formatTime(now, viewerTz);
+  document.getElementById("viewer-tz").textContent = viewerTz.replace(/_/g, " ");
+
+  document.getElementById("team-body").innerHTML = members.map(m => {
+    const localTime = formatTime(now, m.tz);
+    const localDate = formatDate(now, m.tz);
+    const hour = getHour(now, m.tz);
+    const working = hour >= m.workStart && hour < m.workEnd;
+    const dotColor = working ? "#1D9E75" : "#9CA3AF";
+    const statusLabel = working ? "Available now" : "Outside hours";
+    const statusColor = working ? "#0F6E56" : "#6B7280";
+
+    return `<tr>
+      <td><span class="role-badge" style="background:${m.badgeBg};color:${m.badgeColor}">${m.role}</span></td>
+      <td>
+        <div class="name-cell">
+          <div class="avatar" style="background:${m.avatarBg};color:${m.avatarColor}">${m.initials}</div>
+          <div>
+            <div class="name-text">${m.name}</div>
+            <div style="font-size:11px;color:#888;">${m.tzLabel}</div>
+          </div>
+        </div>
+      </td>
+      <td>
+        <div class="local-time">${localTime}</div>
+        <div class="local-date">${localDate}</div>
+      </td>
+      <td><span class="hours-text">9:00 AM – 6:00 PM</span></td>
+      <td>
+        <div class="status-cell">
+          <span class="status-dot" style="background:${dotColor}"></span>
+          <span class="status-text" style="color:${statusColor}">${statusLabel}</span>
+        </div>
+      </td>
+    </tr>`;
+  }).join("");
+}
+
+render();
+setInterval(render, 30000);
+</script>
+</body>
+</html>
