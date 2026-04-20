@@ -3,170 +3,294 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge"/>
 <title>Support Team Members</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
-  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #fff; color: #1a1a1a; padding: 24px; }
+  body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #ffffff; color: #1a1a1a; padding: 28px 32px; }
   h1 { font-size: 26px; font-weight: 600; color: #1a3a5c; margin-bottom: 6px; }
-  .subtitle { font-size: 13px; color: #666; margin-bottom: 6px; }
+  .subtitle { font-size: 13px; color: #666; margin-bottom: 10px; }
   .your-time-banner { display: inline-flex; align-items: center; gap: 8px; background: #f4f6f8; border-radius: 8px; padding: 8px 14px; font-size: 13px; color: #555; margin-bottom: 24px; }
   .your-time-banner strong { color: #1a1a1a; }
   table { width: 100%; border-collapse: collapse; font-size: 14px; }
-  thead th { text-align: left; font-size: 12px; font-weight: 600; color: #888; padding: 0 12px 10px; border-bottom: 1px solid #e5e7eb; text-transform: uppercase; letter-spacing: 0.04em; }
-  tbody td { padding: 14px 12px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+  thead th { text-align: left; font-size: 11px; font-weight: 600; color: #888; padding: 0 12px 10px; border-bottom: 1.5px solid #e5e7eb; text-transform: uppercase; letter-spacing: 0.05em; }
+  tbody td { padding: 12px 12px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
   tbody tr:last-child td { border-bottom: none; }
-  tbody tr:hover { background: #fafafa; }
+  tbody tr:hover td { background: #fafafa; }
+  .section-divider td { background: #f8f9fb; padding: 6px 12px; }
+  .section-label { font-size: 10px; font-weight: 700; color: #aaa; text-transform: uppercase; letter-spacing: 0.08em; }
   .role-badge { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 4px; display: inline-block; white-space: nowrap; }
-  .avatar { width: 34px; height: 34px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 600; margin-right: 10px; flex-shrink: 0; }
+  .avatar { width: 32px; height: 32px; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; margin-right: 10px; flex-shrink: 0; }
   .name-cell { display: flex; align-items: center; }
-  .name-text { font-weight: 500; color: #1a1a1a; }
-  .local-time { font-size: 15px; font-weight: 600; color: #1a1a1a; }
+  .name-text { font-weight: 500; color: #1a1a1a; font-size: 14px; }
+  .tz-label { font-size: 11px; color: #888; margin-top: 1px; }
+  .local-time { font-size: 14px; font-weight: 600; color: #1a1a1a; }
   .local-date { font-size: 11px; color: #888; margin-top: 2px; }
-  .hours-text { font-size: 12px; color: #666; }
-  .status-cell { display: flex; align-items: center; gap: 6px; }
+  .hours-text { font-size: 12px; color: #666; white-space: nowrap; }
+  .status-cell { display: flex; align-items: center; gap: 7px; }
   .status-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
   .status-text { font-size: 12px; font-weight: 500; }
-  .footer { font-size: 11px; color: #aaa; margin-top: 16px; }
+  .footer { font-size: 11px; color: #bbb; margin-top: 18px; }
 </style>
 </head>
 <body>
 
 <h1>Support Team Members</h1>
-<p class="subtitle">All times shown in each member's local timezone. Status auto-updates.</p>
+<p class="subtitle">All times shown in each member's local timezone. Status auto-updates every 30 seconds.</p>
+
 <div class="your-time-banner">
-  Your local time: <strong id="viewer-time">—</strong>
-  <span style="color:#ccc">|</span>
-  <span id="viewer-tz" style="font-size:12px;color:#888">detecting...</span>
+  Your local time: <strong id="viewer-time">loading...</strong>
+  <span style="color:#ddd">|</span>
+  <span id="viewer-tz" style="font-size:12px;color:#999">detecting timezone...</span>
 </div>
 
 <table>
   <thead>
     <tr>
-      <th>Role</th>
-      <th>Name</th>
-      <th>Local Time</th>
-      <th>Working Hours</th>
-      <th>Status</th>
+      <th style="width:22%">Role</th>
+      <th style="width:24%">Name</th>
+      <th style="width:16%">Local Time</th>
+      <th style="width:18%">Working Hours</th>
+      <th style="width:20%">Status</th>
     </tr>
   </thead>
   <tbody id="team-body"></tbody>
 </table>
 
-<p class="footer">Working hours are 9:00 AM – 6:00 PM in each member's local timezone. Updates every 30 seconds.</p>
+<p class="footer">Status is based on each member's local working hours. Updates every 30 seconds.</p>
 
-<script>
-const members = [
-  {
-    role: "Director",
-    name: "Mac Hill",
-    handle: "@Mac Hill",
-    tz: "America/Chicago",
-    tzLabel: "Central Time (CT)",
-    workStart: 9, workEnd: 18,
-    initials: "MH",
-    avatarBg: "#E6F1FB", avatarColor: "#0C447C",
-    badgeBg: "#E6F1FB", badgeColor: "#0C447C"
-  },
-  {
-    role: "Manager",
-    name: "Jason Tuchler",
-    handle: "@Jason Tuchler",
-    tz: "America/Los_Angeles",
-    tzLabel: "Pacific Time (PT)",
-    workStart: 9, workEnd: 18,
-    initials: "JT",
-    avatarBg: "#E1F5EE", avatarColor: "#085041",
-    badgeBg: "#E1F5EE", badgeColor: "#085041"
-  },
-  {
-    role: "Team Lead",
-    name: "Umair Siddiqi",
-    handle: "@Umair Siddiqi",
-    tz: "Asia/Karachi",
-    tzLabel: "Pakistan Standard Time (PKT)",
-    workStart: 9, workEnd: 18,
-    initials: "US",
-    avatarBg: "#EEEDFE", avatarColor: "#3C3489",
-    badgeBg: "#EEEDFE", badgeColor: "#3C3489"
-  },
-  {
-    role: "Sr. Support Engineer",
-    name: "Alex Chepurnoy",
-    handle: "@Alex Chepurnoy",
-    tz: "America/New_York",
-    tzLabel: "Eastern Time (ET)",
-    workStart: 9, workEnd: 18,
-    initials: "AC",
-    avatarBg: "#FAECE7", avatarColor: "#712B13",
-    badgeBg: "#FAECE7", badgeColor: "#712B13"
-  },
-  {
-    role: "Sr. Support Engineer",
-    name: "Jason Hilton",
-    handle: "@Jason Hilton",
-    tz: "Europe/London",
-    tzLabel: "Greenwich Mean Time (GMT)",
-    workStart: 9, workEnd: 18,
-    initials: "JH",
-    avatarBg: "#EAF3DE", avatarColor: "#27500A",
-    badgeBg: "#EAF3DE", badgeColor: "#27500A"
+<script type="text/javascript">
+(function() {
+
+  var SECTIONS = [
+    {
+      label: "Leadership",
+      members: [
+        {
+          role: "Sr. Manager Technical Support",
+          name: "Jesus Orozco",
+          tz: "America/Los_Angeles",
+          tzLabel: "Pacific Time (PT)",
+          workStart: 8, workEnd: 17,
+          initials: "JO",
+          avatarBg: "#E6F1FB", avatarColor: "#0C447C",
+          badgeBg: "#E6F1FB", badgeColor: "#0C447C"
+        },
+        {
+          role: "Manager Technical Support",
+          name: "Umair Siddiqi",
+          tz: "Asia/Karachi",
+          tzLabel: "Pakistan Standard Time (PKT)",
+          workStart: 11, workEnd: 20,
+          initials: "US",
+          avatarBg: "#EEEDFE", avatarColor: "#3C3489",
+          badgeBg: "#EEEDFE", badgeColor: "#3C3489"
+        },
+        {
+          role: "Manager Escalations / Sr. Support Engineer",
+          name: "Michelle Brinker",
+          tz: "America/New_York",
+          tzLabel: "Eastern Time (ET)",
+          workStart: 9, workEnd: 18,
+          initials: "MB",
+          avatarBg: "#FBEAF0", avatarColor: "#72243E",
+          badgeBg: "#FBEAF0", badgeColor: "#72243E"
+        }
+      ]
+    },
+    {
+      label: "Senior Support Engineers",
+      members: [
+        {
+          role: "Sr. Support Engineer",
+          name: "Bernd Backhaus",
+          tz: "Europe/Berlin",
+          tzLabel: "Central European Time (CET)",
+          workStart: 8, workEnd: 17,
+          initials: "BB",
+          avatarBg: "#FAECE7", avatarColor: "#712B13",
+          badgeBg: "#FAECE7", badgeColor: "#712B13"
+        },
+        {
+          role: "Sr. Support Engineer",
+          name: "Jason Hilton",
+          tz: "Europe/London",
+          tzLabel: "UK Time (GMT/BST)",
+          workStart: 8, workEnd: 17,
+          initials: "JH",
+          avatarBg: "#EAF3DE", avatarColor: "#27500A",
+          badgeBg: "#EAF3DE", badgeColor: "#27500A"
+        }
+      ]
+    },
+    {
+      label: "Support Engineers",
+      members: [
+        {
+          role: "Support Engineer",
+          name: "Cory Baber",
+          tz: "America/New_York",
+          tzLabel: "Eastern Time (ET)",
+          workStart: 8, workEnd: 17,
+          initials: "CB",
+          avatarBg: "#E6F1FB", avatarColor: "#185FA5",
+          badgeBg: "#E6F1FB", badgeColor: "#185FA5"
+        },
+        {
+          role: "Support Engineer",
+          name: "Charu Pugazhenthi",
+          tz: "Asia/Kolkata",
+          tzLabel: "India Standard Time (IST)",
+          workStart: 6, workEnd: 15,
+          initials: "CP",
+          avatarBg: "#FAEEDA", avatarColor: "#633806",
+          badgeBg: "#FAEEDA", badgeColor: "#633806"
+        },
+        {
+          role: "Support Engineer",
+          name: "Drumil Desai",
+          tz: "Asia/Kolkata",
+          tzLabel: "India Standard Time (IST)",
+          workStart: 8, workEnd: 17,
+          initials: "DD",
+          avatarBg: "#E1F5EE", avatarColor: "#085041",
+          badgeBg: "#E1F5EE", badgeColor: "#085041"
+        },
+        {
+          role: "Support Engineer",
+          name: "Michael Flynt",
+          tz: "America/New_York",
+          tzLabel: "Eastern Time (ET)",
+          workStart: 9, workEnd: 18,
+          initials: "MF",
+          avatarBg: "#FAECE7", avatarColor: "#993C1D",
+          badgeBg: "#FAECE7", badgeColor: "#993C1D"
+        },
+        {
+          role: "Support Engineer",
+          name: "Naushad Ansari",
+          tz: "Europe/London",
+          tzLabel: "Based in Delhi \u2022 Works UK Hours (GMT/BST)",
+          workStart: 8, workEnd: 17,
+          initials: "NA",
+          avatarBg: "#EAF3DE", avatarColor: "#3B6D11",
+          badgeBg: "#EAF3DE", badgeColor: "#3B6D11"
+        },
+        {
+          role: "Support Engineer",
+          name: "Taniya Shrivastava",
+          tz: "Asia/Kolkata",
+          tzLabel: "India Standard Time (IST)",
+          workStart: 12, workEnd: 21,
+          initials: "TS",
+          avatarBg: "#FBEAF0", avatarColor: "#993556",
+          badgeBg: "#FBEAF0", badgeColor: "#993556"
+        },
+        {
+          role: "Support Engineer",
+          name: "Vihari Kumar",
+          tz: "Asia/Kolkata",
+          tzLabel: "India Standard Time (IST)",
+          workStart: 6, workEnd: 15,
+          initials: "VK",
+          avatarBg: "#EEEDFE", avatarColor: "#534AB7",
+          badgeBg: "#EEEDFE", badgeColor: "#534AB7"
+        },
+        {
+          role: "Support Engineer",
+          name: "Vijay Sarathy",
+          tz: "Asia/Kolkata",
+          tzLabel: "India Standard Time (IST)",
+          workStart: 9, workEnd: 18,
+          initials: "VS",
+          avatarBg: "#E6F1FB", avatarColor: "#042C53",
+          badgeBg: "#E6F1FB", badgeColor: "#042C53"
+        },
+        {
+          role: "Support Engineer",
+          name: "Wolfgang Baum",
+          tz: "America/Denver",
+          tzLabel: "Mountain Time (MST)",
+          workStart: 11, workEnd: 20,
+          initials: "WB",
+          avatarBg: "#FAECE7", avatarColor: "#4A1B0C",
+          badgeBg: "#FAECE7", badgeColor: "#4A1B0C"
+        }
+      ]
+    }
+  ];
+
+  function fmt(date, tz, opts) {
+    try { return date.toLocaleString("en-US", Object.assign({ timeZone: tz }, opts)); }
+    catch(e) { return "--"; }
   }
-];
 
-function formatTime(date, tz) {
-  return date.toLocaleTimeString("en-US", { timeZone: tz, hour: "2-digit", minute: "2-digit", hour12: true });
-}
-function formatDate(date, tz) {
-  return date.toLocaleDateString("en-US", { timeZone: tz, weekday: "short", month: "short", day: "numeric" });
-}
-function getHour(date, tz) {
-  const h = parseInt(date.toLocaleTimeString("en-US", { timeZone: tz, hour: "2-digit", hour12: false }));
-  return isNaN(h) ? 0 : h;
-}
+  function getHour(date, tz) {
+    try {
+      var s = date.toLocaleTimeString("en-US", { timeZone: tz, hour: "2-digit", hour12: false });
+      var h = parseInt(s, 10);
+      return isNaN(h) ? 0 : (h === 24 ? 0 : h);
+    } catch(e) { return 0; }
+  }
 
-function render() {
-  const now = new Date();
-  const viewerTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  document.getElementById("viewer-time").textContent = formatTime(now, viewerTz);
-  document.getElementById("viewer-tz").textContent = viewerTz.replace(/_/g, " ");
+  function pad(n) { return n < 10 ? "0" + n : "" + n; }
+  function fmtHour(h) {
+    var ampm = h >= 12 ? "PM" : "AM";
+    var h12 = h % 12 || 12;
+    return h12 + ":00 " + ampm;
+  }
 
-  document.getElementById("team-body").innerHTML = members.map(m => {
-    const localTime = formatTime(now, m.tz);
-    const localDate = formatDate(now, m.tz);
-    const hour = getHour(now, m.tz);
-    const working = hour >= m.workStart && hour < m.workEnd;
-    const dotColor = working ? "#1D9E75" : "#9CA3AF";
-    const statusLabel = working ? "Available now" : "Outside hours";
-    const statusColor = working ? "#0F6E56" : "#6B7280";
+  function render() {
+    var now = new Date();
 
-    return `<tr>
-      <td><span class="role-badge" style="background:${m.badgeBg};color:${m.badgeColor}">${m.role}</span></td>
-      <td>
-        <div class="name-cell">
-          <div class="avatar" style="background:${m.avatarBg};color:${m.avatarColor}">${m.initials}</div>
-          <div>
-            <div class="name-text">${m.name}</div>
-            <div style="font-size:11px;color:#888;">${m.tzLabel}</div>
-          </div>
-        </div>
-      </td>
-      <td>
-        <div class="local-time">${localTime}</div>
-        <div class="local-date">${localDate}</div>
-      </td>
-      <td><span class="hours-text">9:00 AM – 6:00 PM</span></td>
-      <td>
-        <div class="status-cell">
-          <span class="status-dot" style="background:${dotColor}"></span>
-          <span class="status-text" style="color:${statusColor}">${statusLabel}</span>
-        </div>
-      </td>
-    </tr>`;
-  }).join("");
-}
+    try {
+      var viewerTz = Intl.DateTimeFormat().resolvedOptions().timeZone;
+      var el = document.getElementById("viewer-time");
+      if (el) el.textContent = fmt(now, viewerTz, { hour: "2-digit", minute: "2-digit", hour12: true });
+      var elTz = document.getElementById("viewer-tz");
+      if (elTz) elTz.textContent = viewerTz.replace(/_/g, " ");
+    } catch(e) {}
 
-render();
-setInterval(render, 30000);
+    var html = "";
+
+    for (var s = 0; s < SECTIONS.length; s++) {
+      var section = SECTIONS[s];
+      html += '<tr class="section-divider"><td colspan="5"><span class="section-label">' + section.label + '</span></td></tr>';
+
+      for (var i = 0; i < section.members.length; i++) {
+        var m = section.members[i];
+        var localTime = fmt(now, m.tz, { hour: "2-digit", minute: "2-digit", hour12: true });
+        var localDate = fmt(now, m.tz, { weekday: "short", month: "short", day: "numeric" });
+        var hour = getHour(now, m.tz);
+        var working = (hour >= m.workStart && hour < m.workEnd);
+        var dotColor    = working ? "#1D9E75" : "#9CA3AF";
+        var statusLabel = working ? "Available now" : "Outside hours";
+        var statusColor = working ? "#0F6E56" : "#6B7280";
+        var hoursStr = fmtHour(m.workStart) + " \u2013 " + fmtHour(m.workEnd);
+
+        html += '<tr>';
+        html += '<td><span class="role-badge" style="background:' + m.badgeBg + ';color:' + m.badgeColor + '">' + m.role + '</span></td>';
+        html += '<td><div class="name-cell">'
+              +   '<div class="avatar" style="background:' + m.avatarBg + ';color:' + m.avatarColor + '">' + m.initials + '</div>'
+              +   '<div><div class="name-text">' + m.name + '</div><div class="tz-label">' + m.tzLabel + '</div></div>'
+              + '</div></td>';
+        html += '<td><div class="local-time">' + localTime + '</div><div class="local-date">' + localDate + '</div></td>';
+        html += '<td><span class="hours-text">' + hoursStr + '</span></td>';
+        html += '<td><div class="status-cell">'
+              +   '<span class="status-dot" style="background:' + dotColor + '"></span>'
+              +   '<span class="status-text" style="color:' + statusColor + '">' + statusLabel + '</span>'
+              + '</div></td>';
+        html += '</tr>';
+      }
+    }
+
+    var tbody = document.getElementById("team-body");
+    if (tbody) tbody.innerHTML = html;
+  }
+
+  render();
+  setInterval(render, 30000);
+})();
 </script>
 </body>
 </html>
